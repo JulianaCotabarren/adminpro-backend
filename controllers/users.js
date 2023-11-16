@@ -1,6 +1,7 @@
 const { response } = require("express");
 const bcrypt = require("bcryptjs");
 const User = require("../models/user");
+const { generateJWT } = require("../helpers/jwt");
 
 const getUsers = async (req, res) => {
   const users = await User.find({}, "name email role google");
@@ -28,11 +29,16 @@ const createUser = async (req, res = response) => {
     const salt = bcrypt.genSaltSync();
     user.password = bcrypt.hashSync(password, salt);
 
+    //Save user
     await user.save();
+
+    //Generate JWT
+    const token = await generateJWT(user.id);
 
     res.json({
       ok: true,
       user,
+      token,
     });
   } catch (error) {
     console.log(error);
