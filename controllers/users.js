@@ -43,4 +43,48 @@ const createUser = async (req, res = response) => {
   }
 };
 
-module.exports = { getUsers, createUser };
+const updateUser = async (req, res = response) => {
+  const uid = req.params.id;
+
+  try {
+    const userDB = await User.findById(uid);
+    if (!userDB) {
+      return res.status(404).json({
+        ok: false,
+        msg: "User does not exist with the provided id",
+      });
+    }
+
+    const fields = req.body;
+    if (userDB.email === req.body.email) {
+      delete fields.email;
+    } else {
+      const emailExist = await User.findOne({ email: req.body.email });
+      if (emailExist) {
+        return res.status(400).json({
+          ok: false,
+          msg: "There is an user registered with this email",
+        });
+      }
+    }
+    delete fields.password;
+    delete fields.google;
+
+    const updatedUser = await User.findByIdAndUpdate(uid, fields, {
+      new: true,
+    });
+
+    res.json({
+      ok: true,
+      user: updatedUser,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      ok: false,
+      msg: "Unexpected error",
+    });
+  }
+};
+
+module.exports = { getUsers, createUser, updateUser };
