@@ -11,6 +11,9 @@ const app = express();
 // CORS configuration
 app.use(cors());
 
+// Public folder
+app.use(express.static("public"));
+
 // Reading and Body parsing
 app.use(express.json());
 
