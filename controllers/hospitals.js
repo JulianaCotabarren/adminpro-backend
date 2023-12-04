@@ -44,11 +44,43 @@ const createHospital = async (req, res = response) => {
   }
 };
 
-const updateHospital = (req, res = response) => {
-  res.json({
-    ok: true,
-    msg: "updateHospital",
-  });
+const updateHospital = async (req, res = response) => {
+  const id = req.params.id;
+  const uid = req.uid;
+
+  try {
+    const hospital = await Hospital.findById(id);
+
+    if (!hospital) {
+      return res.status(404).json({
+        ok: false,
+        msg: "Hospital not founded",
+      });
+    }
+
+    const changesHospital = {
+      ...req.body,
+      user: uid,
+    };
+
+    const updatedHospital = await Hospital.findByIdAndUpdate(
+      id,
+      changesHospital,
+      { new: true }
+    );
+
+    res.json({
+      ok: true,
+      msg: "updateHospital",
+      hospital: updatedHospital,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      ok: false,
+      msg: "Unexpected error",
+    });
+  }
 };
 
 const deleteHospital = (req, res = response) => {
