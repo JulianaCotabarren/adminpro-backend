@@ -43,18 +43,68 @@ const createDoctor = async (req, res = response) => {
   }
 };
 
-const updateDoctor = (req, res = response) => {
-  res.json({
-    ok: true,
-    msg: "updateDoctor",
-  });
+const updateDoctor = async (req, res = response) => {
+  const id = req.params.id;
+  const uid = req.uid;
+
+  try {
+    const doctor = await Doctor.findById(id);
+
+    if (!doctor) {
+      return res.status(404).json({
+        ok: false,
+        msg: "Doctor not founded",
+      });
+    }
+
+    const changesDoctor = {
+      ...req.body,
+      user: uid,
+    };
+
+    const updatedDoctor = await Doctor.findByIdAndUpdate(id, changesDoctor, {
+      new: true,
+    });
+
+    res.json({
+      ok: true,
+      doctor: updatedDoctor,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      ok: false,
+      msg: "Unexpected error",
+    });
+  }
 };
 
-const deleteDoctor = (req, res = response) => {
-  res.json({
-    ok: true,
-    msg: "deleteDoctor",
-  });
+const deleteDoctor = async (req, res = response) => {
+  const id = req.params.id;
+
+  try {
+    const doctor = await Doctor.findById(id);
+
+    if (!doctor) {
+      return res.status(404).json({
+        ok: false,
+        msg: "Doctor not founded",
+      });
+    }
+
+    await Doctor.findByIdAndDelete(id);
+
+    res.json({
+      ok: true,
+      msg: "Doctor deleted",
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      ok: false,
+      msg: "Unexpected error",
+    });
+  }
 };
 
 module.exports = {
