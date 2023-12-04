@@ -71,7 +71,6 @@ const updateHospital = async (req, res = response) => {
 
     res.json({
       ok: true,
-      msg: "updateHospital",
       hospital: updatedHospital,
     });
   } catch (error) {
@@ -83,11 +82,32 @@ const updateHospital = async (req, res = response) => {
   }
 };
 
-const deleteHospital = (req, res = response) => {
-  res.json({
-    ok: true,
-    msg: "deleteHospital",
-  });
+const deleteHospital = async (req, res = response) => {
+  const id = req.params.id;
+
+  try {
+    const hospital = await Hospital.findById(id);
+
+    if (!hospital) {
+      return res.status(404).json({
+        ok: false,
+        msg: "Hospital not founded",
+      });
+    }
+
+    await Hospital.findByIdAndDelete(id);
+
+    res.json({
+      ok: true,
+      msg: "Hospital deleted",
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      ok: false,
+      msg: "Unexpected error",
+    });
+  }
 };
 
 module.exports = {
