@@ -67,11 +67,10 @@ const updateUser = async (req, res = response) => {
       });
     }
 
-    const fields = req.body;
-    if (userDB.email === req.body.email) {
-      delete fields.email;
-    } else {
-      const emailExist = await User.findOne({ email: req.body.email });
+    const { password, google, email, ...fields } = req.body;
+
+    if (userDB.email !== email) {
+      const emailExist = await User.findOne({ email });
       if (emailExist) {
         return res.status(400).json({
           ok: false,
@@ -79,8 +78,15 @@ const updateUser = async (req, res = response) => {
         });
       }
     }
-    delete fields.password;
-    delete fields.google;
+
+    if (!userDB.google) {
+      fields.email = email;
+    } else if (userDB.email !== email) {
+      return res.status(400).json({
+        ok: false,
+        msg: "Google users can not change their email",
+      });
+    }
 
     const updatedUser = await User.findByIdAndUpdate(uid, fields, {
       new: true,
