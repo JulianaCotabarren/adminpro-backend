@@ -10,7 +10,7 @@ const DoctorSchema = Schema({
   },
   user: {
     type: Schema.Types.ObjectId,
-    required: true,
+    /* required: true, */
     ref: "User",
   },
   hospital: {

@@ -12,11 +12,12 @@ const {
   createDoctor,
   updateDoctor,
   deleteDoctor,
+  getDoctorById,
 } = require("../controllers/doctors");
 
 const router = Router();
 
-router.get("/", getDoctors);
+router.get("/", validateJWT, getDoctors);
 router.post(
   "/",
   [
@@ -40,5 +41,6 @@ router.put(
   updateDoctor
 );
 router.delete("/:id", validateJWT, deleteDoctor);
+router.get("/:id", validateJWT, getDoctorById);
 
 module.exports = router;

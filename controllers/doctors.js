@@ -9,13 +9,33 @@ const getDoctors = async (req, res = response) => {
   res.json({
     ok: true,
     doctors,
-    id: req.id,
   });
+};
+
+const getDoctorById = async (req, res = response) => {
+  const id = req.params.id;
+
+  try {
+    const doctor = await Doctor.findById(id)
+      .populate("user", "name img")
+      .populate("hospital", "name img");
+
+    res.json({
+      ok: true,
+      doctor,
+    });
+  } catch (error) {
+    console.log(error);
+    res.json({
+      ok: true,
+      msg: "Doctor not found",
+    });
+  }
 };
 
 const createDoctor = async (req, res = response) => {
   const { name } = req.body;
-  const { uid } = req.uid;
+  const uid = req.uid;
   const doctor = new Doctor({ user: uid, /* hospital: id, */ ...req.body });
 
   try {
@@ -112,4 +132,5 @@ module.exports = {
   createDoctor,
   updateDoctor,
   deleteDoctor,
+  getDoctorById,
 };
